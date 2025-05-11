@@ -7,9 +7,9 @@ use App\Controllers\BaseController;
 use App\Models\ProductModel;
 use App\Models\CategoryModel;
 use App\Models\BrandModel;
-// use App\Models\AttributeModel;
-// use App\Models\AttributeOptionModel;
-// use App\Models\ProductAttributeValueModel;
+use App\Models\AttributeModel;
+use App\Models\AttributeOptionModel;
+use App\Models\ProductAttributeValueModel;
 // use App\Models\ProductInventoryModel;
 // use App\Models\ProductImageModel;
 
@@ -18,9 +18,9 @@ class Products extends BaseController
     protected $productModel;
     protected $categoryModel;
     protected $brandModel;
-    // protected $attributeModel;
-    // protected $attributeOptionModel;
-    // protected $productAttributeValueModel;
+    protected $attributeModel;
+    protected $attributeOptionModel;
+    protected $productAttributeValueModel;
     // protected $productInventoryModel;
     // protected $productImageModel;
 
@@ -31,9 +31,9 @@ class Products extends BaseController
         $this->productModel = new ProductModel();
         $this->categoryModel = new CategoryModel();
         $this->brandModel = new BrandModel();
-        // $this->attributeModel = new AttributeModel();
-        // $this->attributeOptionModel = new AttributeOptionModel();
-        // $this->productAttributeValueModel = new ProductAttributeValueModel();
+        $this->attributeModel = new AttributeModel();
+        $this->attributeOptionModel = new AttributeOptionModel();
+        $this->productAttributeValueModel = new ProductAttributeValueModel();
         // $this->productInventoryModel = new ProductInventoryModel();
         // $this->productImageModel = new ProductImageModel();
 
@@ -103,8 +103,17 @@ class Products extends BaseController
 
     public function create()
     {
-        // $this->data['configurableAttributes'] = $this->getConfigurableAttributes();
+        $this->data['configurableAttributes'] = $this->getConfigurableAttributes();
         return view('admin/products/create', $this->data);
+    }
+
+    private function getConfigurableAttributes()
+    {
+        $configurableAttributes = $this->attributeModel
+            ->where('is_configurable', true)
+            ->findAll();
+
+        return $configurableAttributes;
     }
 
     public function store()
@@ -127,11 +136,11 @@ class Products extends BaseController
             'status' => $this->request->getVar('status'),
         ];
 
-        // if ($params['type'] == $this->productModel::CONFIGURABLE) {
-        //     $params['status'] = $this->productModel::DRAFT;
-        //     $params['price'] = 0;
-        //     $params['configurable'] = $this->request->getVar('configurable');
-        // }
+        if ($params['type'] == $this->productModel::CONFIGURABLE) {
+            $params['status'] = $this->productModel::DRAFT;
+            $params['price'] = 0;
+            $params['configurable'] = $this->request->getVar('configurable');
+        }
 
         $this->db->transStart();
         $this->productModel->save($params);
@@ -140,7 +149,7 @@ class Products extends BaseController
 
         
 
-        if ($product /* && $product->type == $this->productModel::SIMPLE */) {
+        if ($product && $product->type == $this->productModel::SIMPLE ) {
             $productInventoryTable = $this->db->table('product_inventories');
             $productInventoryTable->insert([
                 'product_id' => $product->id,
@@ -158,12 +167,16 @@ class Products extends BaseController
             }
         }
 
+        if ($product->type == $this->productModel::CONFIGURABLE) {
+            $this->generateProductVariants($product, $params);
+        }
+
         $this->db->transComplete();
 
         if ($product) {
-            // if ($product->type == $this->productModel::CONFIGURABLE) {
-            //     return redirect()->to('/admin/products/' . $product->id . '/edit');
-            // }
+            if ($product->type == $this->productModel::CONFIGURABLE) {
+                return redirect()->to('/admin/products/' . $product->id . '/edit');
+            }
             $this->session->setFlashdata('success', 'Product berhasil di save.');
             return redirect()->to('/admin/products');
         } else {
@@ -172,25 +185,99 @@ class Products extends BaseController
             return view('admin/products/create', $this->data);
         }
         
-        
-
-        // if ($product->type == $this->productModel::CONFIGURABLE) {
-        //     $this->generateProductVariants($product, $params);
-        // }
-
-        
-
-        
     }
 
-    // private function getConfigurableAttributes()
-    // {
-    //     $configurableAttributes = $this->attributeModel
-    //         ->where('is_configurable', true)
-    //         ->findAll();
+    private function generateProductVariants($product, $params)
+        {   
+            
+            $variantAttributes = !(empty($params['configurable'])) ? $params['configurable'] : [];
+            $configurableAttributes = array_column($this->getConfigurableAttributes(), 'code');
 
-    //     return $configurableAttributes;
-    // }
+            $variantAttributes = array_filter($variantAttributes, function ($value, $key) use ($configurableAttributes) {
+                return in_array($key, $configurableAttributes);
+            }, ARRAY_FILTER_USE_BOTH);
+
+            $variants = $this->generateVariantsWithAttributeCombinations($variantAttributes);
+            
+            if ($variants) {
+                foreach ($variants as $variant) {
+                    $variantParams = [
+                        'parent_id' => $product->id,
+                        'user_id' => $product->user_id,
+                        'sku' => $product->sku . '-' . implode('-', array_values($variant)),
+                        'type' => $this->productModel::SIMPLE,
+                        'name' => $product->name . $this->convertVariantAttributesAsName($variant),
+                        'price' => 0,
+                        'status' => $this->productModel::DRAFT,
+                    ];
+
+                    $this->productModel->save($variantParams);
+                    $newProductVariant = $this->productModel->find($this->db->insertID());
+                    
+
+                    $productCategoryTable = $this->db->table('product_categories');
+                    if (!empty($params['categories'])) {
+                        foreach ($params['categories'] as $key => $categoryId) {
+                            $productCategoryTable->insert([
+                                'product_id' => $newProductVariant->id,
+                                'category_id' => $categoryId,
+                            ]);
+                        }
+                    }
+
+                    
+                    $this->saveProductAttributeValues($newProductVariant, $variant, $product->id);
+                }
+            }
+        }
+
+    private function saveProductAttributeValues($product, $variant, $parentProductID)
+    {
+        foreach (array_values($variant) as $attributeOptionID) {
+            $attributeOption = $this->attributeOptionModel->find($attributeOptionID);
+
+            $attributeValueParams = [
+                'parent_product_id' => $parentProductID,
+                'product_id' => $product->id,
+                'attribute_id' => $attributeOption->attribute_id,
+                'attribute_option_id' => $attributeOptionID,
+                'text_value' => $attributeOption->name,
+            ];
+
+            
+            $this->productAttributeValueModel->save($attributeValueParams);
+        }
+    }
+    
+    private function convertVariantAttributesAsName($variant)
+    {
+        $variantName = '';
+
+        foreach (array_keys($variant) as $key => $code) {
+            $attributeOptionID = $variant[$code];
+            $attributeOption = $this->attributeOptionModel->find($attributeOptionID);
+
+            if ($attributeOption) {
+                $variantName .= ' - ' . $attributeOption->name;
+            }
+        }
+
+        return $variantName;
+    }
+    private function generateVariantsWithAttributeCombinations($arrays)
+    {
+        $result = [[]];
+        foreach ($arrays as $property => $property_values) {
+            $tmp = [];
+            foreach ($result as $result_item) {
+                foreach ($property_values as $property_value) {
+                    $tmp[] = array_merge($result_item, array($property => $property_value));
+                }
+            }
+            $result = $tmp;
+        }
+        return $result;
+    }
 
     // public function edit($id)
     // {
@@ -208,7 +295,7 @@ class Products extends BaseController
     //     return view('admin/products/form', $this->data);
     // }
 
-    
+
 
     // public function update($id)
     // {
@@ -456,92 +543,11 @@ class Products extends BaseController
     //     $this->productInventoryModel->save($params);
     // }
 
-    // private function generateProductVariants($product, $params)
-    // {
-    //     $variantAttributes = !(empty($params['configurable'])) ? $params['configurable'] : [];
-    //     $configurableAttributes = array_column($this->getConfigurableAttributes(), 'code');
+    // 
 
-    //     $variantAttributes = array_filter($variantAttributes, function ($value, $key) use ($configurableAttributes) {
-    //         return in_array($key, $configurableAttributes);
-    //     }, ARRAY_FILTER_USE_BOTH);
+    
 
-    //     $variants = $this->generateVariantsWithAttributeCombinations($variantAttributes);
+    
 
-    //     if ($variants) {
-    //         foreach ($variants as $variant) {
-    //             $variantParams = [
-    //                 'parent_id' => $product->id,
-    //                 'user_id' => $product->user_id,
-    //                 'sku' => $product->sku . '-' . implode('-', array_values($variant)),
-    //                 'type' => $this->productModel::SIMPLE,
-    //                 'name' => $product->name . $this->convertVariantAttributesAsName($variant),
-    //                 'price' => 0,
-    //                 'status' => $this->productModel::DRAFT,
-    //             ];
 
-    //             $this->productModel->save($variantParams);
-    //             $newProductVariant = $this->productModel->find($this->db->insertID());
-
-    //             $productCategoryTable = $this->db->table('product_categories');
-    //             if (!empty($params['categories'])) {
-    //                 foreach ($params['categories'] as $key => $categoryId) {
-    //                     $productCategoryTable->insert([
-    //                         'product_id' => $newProductVariant->id,
-    //                         'category_id' => $categoryId,
-    //                     ]);
-    //                 }
-    //             }
-
-    //             $this->saveProductAttributeValues($newProductVariant, $variant, $product->id);
-    //         }
-    //     }
-    // }
-
-    // private function saveProductAttributeValues($product, $variant, $parentProductID)
-    // {
-    //     foreach (array_values($variant) as $attributeOptionID) {
-    //         $attributeOption = $this->attributeOptionModel->find($attributeOptionID);
-
-    //         $attributeValueParams = [
-    //             'parent_product_id' => $parentProductID,
-    //             'product_id' => $product->id,
-    //             'attribute_id' => $attributeOption->attribute_id,
-    //             'attribute_option_id' => $attributeOptionID,
-    //             'text_value' => $attributeOption->name,
-    //         ];
-
-    //         $this->productAttributeValueModel->save($attributeValueParams);
-    //     }
-    // }
-
-    // private function convertVariantAttributesAsName($variant)
-    // {
-    //     $variantName = '';
-
-    //     foreach (array_keys($variant) as $key => $code) {
-    //         $attributeOptionID = $variant[$code];
-    //         $attributeOption = $this->attributeOptionModel->find($attributeOptionID);
-
-    //         if ($attributeOption) {
-    //             $variantName .= ' - ' . $attributeOption->name;
-    //         }
-    //     }
-
-    //     return $variantName;
-    // }
-
-    // private function generateVariantsWithAttributeCombinations($arrays)
-    // {
-    //     $result = [[]];
-    //     foreach ($arrays as $property => $property_values) {
-    //         $tmp = [];
-    //         foreach ($result as $result_item) {
-    //             foreach ($property_values as $property_value) {
-    //                 $tmp[] = array_merge($result_item, array($property => $property_value));
-    //             }
-    //         }
-    //         $result = $tmp;
-    //     }
-    //     return $result;
-    // }
 }
