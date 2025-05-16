@@ -79,12 +79,12 @@ class Products extends BaseController
         return view('admin/products/index', $this->data);
     }
 
-    // public function trashed()
-    // {
-    //     $this->getProducts(['onlyDeleted' => true]);
-    //     $this->data['currentAdminSubMenu'] = 'deleted-product';
-    //     return view('admin/products/index', $this->data);
-    // }
+    public function trashed()
+    {
+        $this->getProducts(['onlyDeleted' => true]);
+        $this->data['currentAdminSubMenu'] = 'deleted-product';
+        return view('admin/products/index', $this->data);
+    }
 
     private function getProducts($options = [])
     {
@@ -272,6 +272,52 @@ class Products extends BaseController
         }
     }
 
+    public function destroy($id)
+    {
+        $product = $this->productModel->withDeleted()->find($id);
+
+        if (!$product) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+        $this->productModel->delete($id);
+
+        if (empty($product->deleted_at)) {
+            $this->productModel->delete($id);
+
+            $this->session->setFlashdata('success', 'Product berhasil dihapus.');
+            return redirect()->to('/admin/products');
+        } else {
+            $this->db->table('product_categories')->where('product_id', $id)->delete();
+            $this->productAttributeValueModel->where('product_id', $id)->delete();
+            $this->productInventoryModel->where('product_id', $id)->delete();
+
+            $this->productModel->delete($id, true);
+
+            $this->session->setFlashdata('success', 'Produk telah dihapus secara permanen.');
+            return redirect()->to('/admin/products/trashed');
+        }
+    }
+
+    public function restore($id)
+    {
+        $product = $this->productModel->withDeleted()->find($id);
+
+        if (!$product) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+        
+        if ($product->deleted_at) {
+            $params = [
+                'deleted_at' => null,
+            ];
+
+            $this->productModel->update($id, $params);
+
+            $this->session->setFlashdata('success', 'Product berhasil dipulihkan.');
+            return redirect()->to('/admin/products');
+        }
+    }
+
     public function images($id)
     {
         $product = $this->productModel->find($id);
@@ -341,19 +387,19 @@ class Products extends BaseController
         return redirect()->to('/admin/products/' . $productId . '/images');
     }
 
-    // public function destroyImage($id)
-    // {
-    //     $image = $this->productImageModel->find($id);
+    public function destroyImage($id)
+    {
+        $image = $this->productImageModel->find($id);
 
-    //     if (!$image) {
-    //         throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-    //     }
+        if (!$image) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
 
-    //     $this->productImageModel->delete($id);
+        $this->productImageModel->delete($id);
 
-    //     $this->session->setFlashdata('success', 'Image has been deleted.');
-    //     return redirect()->to('/admin/products/' . $image->product_id . '/images');
-    // }
+        $this->session->setFlashdata('success', 'Gambar berhasil dihapus.');
+        return redirect()->to('/admin/products/' . $image->product_id . '/images');
+    }
 
     private function generateImages($originalPath, $fileName)
     {
@@ -496,69 +542,4 @@ class Products extends BaseController
         }
         return $result;
     }
-
-    
-
-
-
-    
-
-    // public function destroy($id)
-    // {
-    //     $product = $this->productModel->withDeleted()->find($id);
-
-    //     if (!$product) {
-    //         throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-    //     }
-
-    //     if (empty($product->deleted_at)) {
-    //         $this->productModel->delete($id);
-
-    //         $this->session->setFlashdata('success', 'Product has been deleted.');
-    //         return redirect()->to('/admin/products');
-    //     } else {
-    //         $this->db->table('product_categories')->where('product_id', $id)->delete();
-    //         $this->productAttributeValueModel->where('product_id', $id)->delete();
-    //         $this->productInventoryModel->where('product_id', $id)->delete();
-
-    //         $this->productModel->delete($id, true);
-
-    //         $this->session->setFlashdata('success', 'Product has been deleted permanently.');
-    //         return redirect()->to('/admin/products/trashed');
-    //     }
-    // }
-
-    // public function restore($id)
-    // {
-    //     $product = $this->productModel->withDeleted()->find($id);
-
-    //     if (!$product) {
-    //         throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-    //     }
-
-    //     if ($product->deleted_at) {
-    //         $params = [
-    //             'deleted_at' => null,
-    //         ];
-
-    //         $this->productModel->update($id, $params);
-
-    //         $this->session->setFlashdata('success', 'Product has been restored.');
-    //         return redirect()->to('/admin/products');
-    //     }
-    // }
-
-    
-
-    
-
-    
-
-    // 
-
-    
-
-    
-
-
 }

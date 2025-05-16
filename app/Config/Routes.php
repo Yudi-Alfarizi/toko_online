@@ -19,7 +19,8 @@ $routes->post('/auth/login', 'Auth::login');
 $routes->get('/auth/logout', 'Auth::logout');
 
 $routes->group('admin', ['filter' => 'admin-auth:admin,operator'],function ($routes) {
-    $routes->get('dashboard', 'Admin\Dashboard::index'); 
+    $routes->get('dashboard', 'Admin\Dashboard::index');
+    $routes->get('products/trashed', 'Admin\Products::trashed');
     $routes->get('categories', 'Admin\Categories::index'); 
     $routes->get('categories/(:num)', 'Admin\Categories::index/$1');
     $routes->post('categories', 'Admin\Categories::store');
@@ -52,7 +53,7 @@ $routes->group('admin', ['filter' => 'admin-auth:admin,operator'],function ($rou
     $routes->post('products', 'Admin\Products::store');
     $routes->put('products/(:num)', 'Admin\Products::update/$1');
     $routes->delete('products/(:num)', 'Admin\Products::destroy/$1');
-    // $routes->get('products/restore/(:num)', 'Admin\Products::restore/$1');
+    $routes->get('products/restore/(:num)', 'Admin\Products::restore/$1');
     $routes->get('products/(:num)/images', 'Admin\Products::images/$1');
     $routes->get('products/(:num)/upload-image', 'Admin\Products::uploadImage/$1');
     $routes->post('products/(:num)/upload-image', 'Admin\Products::doUploadImage/$1');
