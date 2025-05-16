@@ -37,6 +37,7 @@ class ProductModel extends Model
     // protected $deletedField  = 'deleted_at';
 
     protected $validationRules    = [
+        'id'   => 'permit_empty',
         'type' => 'required',
         'name'    => 'required|min_length[3]',
         'sku' => 'required|is_unique[products.sku,id,{id}]',

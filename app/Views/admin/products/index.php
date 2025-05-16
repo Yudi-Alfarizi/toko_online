@@ -100,7 +100,7 @@
                                 <?php echo $pager->links('bootstrap', 'bootstrap_pagination') ?>
                             </div>
                             <div class="col-4 text-right">
-                                <a href="<?= site_url('admin/products/create') ?>" class="btn btn-success">New Product</a>
+                                <a href="<?= site_url('admin/products/form') ?>" class="btn btn-success">New Product</a>
                             </div>
                         </div>
                     </div>
