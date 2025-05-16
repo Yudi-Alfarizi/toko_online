@@ -79,7 +79,7 @@
                                                     <a href="<?= site_url('admin/products/restore/' . $product->id) ?>" class="badge bg-warning">restore</a>
                                                     <form method="POST" action="<?= site_url('admin/products/' . $product->id) ?>" accept-charset="UTF-8" class="delete" style="display:inline-block">
                                                         <input name="_method" type="hidden" value="DELETE">
-                                                        <button class="badge bg-danger" style="border:none !important">delete permanently</button>
+                                                        <button class="badge bg-danger" style="border:none !important">hapus permanen</button>
                                                     </form>
                                                 <?php endif; ?>
                                             </td>
