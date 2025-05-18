@@ -14,3 +14,29 @@
     border-color: #f5c6cb; */
     z-index: 999;
 }
+
+.btn-gradient-primary {
+    background: linear-gradient(to right, #4e54c8, #8f94fb);
+    color: #fff;
+    border: none;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(45deg, #0d47a1, #1976d2);
+}
+
+.bg-gradient-info {
+    background: linear-gradient(45deg, #0288d1, #03a9f4);
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(45deg, #f9a825, #ffb300);
+}
+
+.bg-gradient-secondary {
+    background: linear-gradient(45deg, #424242, #616161);
+}
+
+.rounded-4 {
+    border-radius: 1rem !important;
+}

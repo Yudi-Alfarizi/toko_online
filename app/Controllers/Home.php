@@ -6,6 +6,6 @@ class Home extends BaseController
 {
     public function index(): string
     {
-        return view('welcome_message', $this->data);
+        return view('themes/' . $this->data['currentTheme'] . '/pages/home', $this->data);
     }
 }
