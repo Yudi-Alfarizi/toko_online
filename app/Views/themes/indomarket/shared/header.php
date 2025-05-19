@@ -4,22 +4,22 @@
             <div class="row">
                 <div class="col-6 text-left">
                     <ul class="top-links contact-info">
-                        <li><i class="fa fa-envelope-o"></i> <a href="#">contact@example.com</a></li>
-                        <li><i class="fa fa-whatsapp"></i> +1 5589 55488 55</li>
+                        <li><i class="fa fa-envelope-o"></i> <a href="#">ubsi@bsi.ac.id</a></li>
+                        <li><i class="fa fa-whatsapp"></i> 08123456789</li>
                     </ul>
                 </div>
                 <div class="col-6 text-right">
                     <ul class="top-links account-links">
-                    <?php if ($auth->loggedIn()): ?>
-                        <?php if ($auth->inGroup(['admin', 'operator'], $currentUser->id)): ?>
-                            <li><i class="fa fa-tachometer"></i> <a href="<?php echo site_url('admin/dashboard') ?>">Dashboard</a></li>
+                        <?php if ($auth->loggedIn()): ?>
+                            <?php if ($auth->inGroup(['admin', 'operator'], $currentUser->id)): ?>
+                                <li><i class="fa fa-tachometer"></i> <a href="<?php echo site_url('admin/dashboard') ?>">Dashboard</a></li>
+                            <?php endif; ?>
+                            <li><i class="fa fa-user-circle-o"></i> <a href="<?= site_url('auth/edit_user/' . ($currentUser ? $currentUser->id : '')) ?>">My Account</a></li>
+                            <li><i class="fa fa-power-off"></i> <a href="<?php echo site_url('auth/logout') ?>">Logout ( <?php echo $currentUser->first_name ?> )</a></li>
+                        <?php else:  ?>
+                            <li><i class="fa fa-user-circle-o"></i> <a href="<?php echo site_url('auth/create_user') ?>">Register</a></li>
+                            <li><i class="fa fa-power-off"></i> <a href="<?php echo site_url('auth/login') ?>">Login</a></li>
                         <?php endif; ?>
-                        <li><i class="fa fa-user-circle-o"></i> <a href="<?php echo site_url('auth/account') ?>">My Account</a></li>
-                        <li><i class="fa fa-power-off"></i> <a href="<?php echo site_url('auth/logout') ?>">Logout ( <?php echo $currentUser->first_name ?> )</a></li>
-                    <?php else:  ?>
-                        <li><i class="fa fa-user-circle-o"></i> <a href="<?php echo site_url('auth/create_user') ?>">Register</a></li>
-                        <li><i class="fa fa-power-off"></i> <a href="<?php echo site_url('auth/login') ?>">Login</a></li>
-                    <?php endif; ?>
                     </ul>
                 </div>
             </div>
@@ -30,7 +30,7 @@
             <div class="row align-items-center">
                 <div class="col-lg-3 col-12 col-sm-6">
                     <a class="navbar-brand mr-lg-5" href="./index.html">
-                        <i class="fa fa-shopping-bag fa-3x"></i> <span class="logo">IndoMarket</span>
+                        <i class="fa fa-shopping-bag fa-3x"></i> <span class="logo">UBSI MART</span>
                     </a>
                 </div>
                 <div class="col-lg-7 col-12 col-sm-6">
