@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>IndoMarket - Free E-Commerce Website Template built with Boostrap 4 and Argon Design System</title>
+    <title>UBSI Mart - Home</title>
 
     <!-- Fonts -->
     <link

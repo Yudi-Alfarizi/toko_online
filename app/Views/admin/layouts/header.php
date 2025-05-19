@@ -26,10 +26,10 @@
                 <i class="fas fa-caret-down ml-1 text-white"></i>
             </a>
             <div class="dropdown-menu dropdown-menu-right shadow">
-                <a href="<?= site_url('admin/profile') ?>" class="dropdown-item">
+                <a href="<?= site_url('auth/edit_user/' . ($currentUser ? $currentUser->id : '')) ?>" class="dropdown-item">
                     <i class="fas fa-user mr-2"></i> Profile
                 </a>
-                <a href="<?= site_url('admin/settings') ?>" class="dropdown-item">
+                <a href="<?= site_url('auth/edit_user/' . ($currentUser ? $currentUser->id : '')) ?>" class="dropdown-item">
                     <i class="fas fa-cog mr-2"></i> Settings
                 </a>
                 <div class="dropdown-divider"></div>
