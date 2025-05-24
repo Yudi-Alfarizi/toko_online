@@ -49,7 +49,7 @@ class Brands extends BaseController
         ];
 
         if ($this->brandModel->save($params)) {
-            $this->session->setFlashdata('success', 'Brand has been saved.');
+            $this->session->setFlashdata('success', 'Brand berhasil disimpan.');
             return redirect()->to('/admin/brands');
         } else {
             $this->getBrands();
@@ -66,7 +66,7 @@ class Brands extends BaseController
         ];
 
         if ($this->brandModel->save($params)) {
-            $this->session->setFlashdata('success', 'Brand has been updated!');
+            $this->session->setFlashdata('success', 'Brand berhasil di updated!');
             return redirect()->to('/admin/brands');
         } else {
             $this->getBrands();
@@ -80,15 +80,15 @@ class Brands extends BaseController
     {
         $brand = $this->brandModel->find($id);
         if (!$brand) {
-            $this->session->setFlashdata('errors', 'Invalid brand');
+            $this->session->setFlashdata('errors', 'Brand tidak valid');
             return redirect()->to('/admin/brands');
         }
 
         if ($this->brandModel->delete($brand->id)) {
-            $this->session->setFlashdata('success', 'The brand has been deleted');
+            $this->session->setFlashdata('success', 'Brand berhasil di hapus');
             return redirect()->to('/admin/brands');
         } else {
-            $this->session->setFlashdata('errors', 'Could not delete the brand');
+            $this->session->setFlashdata('errors', 'Tidak bisa hapus brand!');
             return redirect()->to('/admin/brands');
         }
     }

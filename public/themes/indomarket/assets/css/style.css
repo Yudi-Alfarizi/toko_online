@@ -141,9 +141,8 @@ body, button, input, select, optgroup, textarea {
 }
 
 .nav-category .menu-category {
-    padding: 0;
     margin: 0;
-    list-style: none;
+    list-style: circle;
     font-size: .9rem;
 }
 

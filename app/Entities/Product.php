@@ -5,6 +5,7 @@ namespace App\Entities;
 use CodeIgniter\Entity\Entity;
 use App\Models\ProductModel;
 use App\Models\ProductInventoryModel;
+use App\Models\ProductImageModel;
 
 class Product extends Entity
 {
@@ -18,12 +19,14 @@ class Product extends Entity
 
     protected $productModel;
     protected $productInventoryModel;
+    protected $productImageModel;
 
     public function __construct(?array $data = null)
     {
         parent::__construct($data); // WAJIB untuk inisialisasi Entity internal CI4
         $this->productModel = new ProductModel();
         $this->productInventoryModel = new ProductInventoryModel();
+        $this->productImageModel = new ProductImageModel();
     }
 
     public function getVariants()
@@ -58,5 +61,33 @@ class Product extends Entity
         $stock = !empty($productInventory) ? $productInventory->qty : 0;
 
         return $stock;
+    }
+
+    public function getFeaturedImage()
+    {
+        $image = $this->productImageModel
+            ->where('product_id', $this->id)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        return $image;
+    }
+    
+    public function getLowestPrice()
+    {
+        if ($this->type === $this->productModel::SIMPLE) {
+            return $this->price;
+        }
+
+        $lowestVariant = $this->productModel
+            ->where('parent_id', $this->id)
+            ->orderBy('price', 'asc')
+            ->first();
+
+        if (!$lowestVariant) {
+            return 0;
+        }
+
+        return $lowestVariant->price;
     }
 }

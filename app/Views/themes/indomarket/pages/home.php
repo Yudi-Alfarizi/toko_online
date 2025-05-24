@@ -9,17 +9,22 @@
         <div class="slider-inner">
             <div class="row">
                 <div class="col-md-3">
-                    <nav class="nav-category">
-                        <h2>Categories</h2>
-                        <ul class="menu-category">
-                            <li><a href="#">Fashions</a></li>
-                            <li><a href="#">Electronics</a></li>
-                            <li><a href="#">Home and Kitchen</a></li>
-                            <li><a href="#">Baby and Toys</a></li>
-                            <li><a href="#">Sports</a></li>
-                            <li><a href="#">Digital Goods</a></li>
-                        </ul>
-                    </nav>
+                    <?php if (!empty($categories)): ?>
+                        <nav class="nav-category">
+                            <h2>Categories</h2>
+                            <ul class="menu-category">
+                                <?php foreach ($categories as $category): ?>
+                                    <?php if (empty($category['parent_id'])): // hanya tampilkan kategori tanpa parent 
+                                    ?>
+                                        <li>
+                                            <a href="<?= site_url('products?category=' . $category['slug']) ?>"><?= esc($category['name']) ?></a>
+                                        </li>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                            </ul>
+                        </nav>
+                    <?php endif; ?>
+
                 </div>
                 <div class="col-md-9">
                     <div id="carouselExampleIndicators" class="carousel slide carousel-fade" data-ride="carousel">
@@ -176,7 +181,7 @@
         </div>
     </div>
 </section>
-<section class="mobile-apps pt-5 pb-3 border-top">
+<!-- <section class="mobile-apps pt-5 pb-3 border-top">
     <div class="container">
         <div class="row">
             <div class="col-md-6">
@@ -187,7 +192,7 @@
                 <a href="#"><img src="<?php echo base_url() . '/themes/' . $currentTheme ?>/assets/img/appstore.png" height="40"></a>
                 <a href="#"><img src="<?php echo base_url() . '/themes/' . $currentTheme ?>/assets/img/appstore.png" height="40"></a>
             </div>
-        </div> <!-- row.// -->
-    </div><!-- container // -->
-</section>
+        </div>
+    </div>
+</section> -->
 <?= $this->endSection() ?>

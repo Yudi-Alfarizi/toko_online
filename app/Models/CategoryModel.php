@@ -83,24 +83,39 @@ class CategoryModel extends Model
 	// 	return $builder->first() !== null;
 	// }
 
-	
+	public function getNestedCategories($level = 0)
+	{
+		$results = [];
+		$categories = $this->where('parent_id', $level)
+			->orderBy('name', 'asc')
+			->findAll();
 
-	
+		if (count($categories) > 0) {
+			foreach ($categories as $key => $category) {
+				$results[$key] = $category->toArray();
+				$results[$key]['children'] = $this->getNestedCategories($category->id);
+			}
+		}
 
-	// public function getNestedCategories($level = 0)
-	// {
-	// 	$results = [];
-	// 	$categories = $this->where('parent_id', $level)
-	// 		->orderBy('name', 'asc')
-	// 		->findAll();
+		return $results;
+	}
 
-	// 	if (count($categories) > 0) {
-	// 		foreach ($categories as $key => $category) {
-	// 			$results[$key] = $category->toArray();
-	// 			$results[$key]['children'] = $this->getNestedCategories($category->id);
-	// 		}
-	// 	}
+	public function getDescendantCategoryIds($parentId)
+	{
+		$descendants = [];
 
-	// 	return $results;
-	// }
+		$categories = $this->findAll();
+
+		foreach ($categories as $category) {
+			$id = is_array($category) ? $category['id'] : $category->id;
+			$parent = is_array($category) ? $category['parent_id'] : $category->parent_id;
+
+			if ($parent == $parentId) {
+				$descendants[] = $id;
+				$descendants = array_merge($descendants, $this->getDescendantCategoryIds($id));
+			}
+		}
+
+		return $descendants;
+	}
 }
