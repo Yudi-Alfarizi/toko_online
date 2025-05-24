@@ -14,6 +14,7 @@ $routes->setAutoRoute(true);
 
 
 $routes->get('/', 'Home::index');
+$routes->get('products', 'Products::index');
 $routes->get('/auth/login', 'Auth::login');
 $routes->post('/auth/login', 'Auth::login');
 $routes->get('/auth/logout', 'Auth::logout');
@@ -23,6 +24,7 @@ $routes->get('auth/edit_user/(:num)', 'Auth::edit_user/$1');
 $routes->post('auth/edit_user/(:num)', 'Auth::edit_user/$1');
 $routes->get('auth/forgot_password', 'Auth::forgot_password');
 $routes->post('auth/forgot_password', 'Auth::forgot_password');
+
 
 $routes->group('admin', ['filter' => 'admin-auth:admin,operator'],function ($routes) {
     $routes->get('dashboard', 'Admin\Dashboard::index');
@@ -65,6 +67,9 @@ $routes->group('admin', ['filter' => 'admin-auth:admin,operator'],function ($rou
     $routes->post('products/(:num)/upload-image', 'Admin\Products::doUploadImage/$1');
     $routes->delete('products/images/(:num)', 'Admin\Products::destroyImage/$1');
 });
+
+
+
     
 
 

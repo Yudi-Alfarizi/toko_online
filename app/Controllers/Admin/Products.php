@@ -204,7 +204,7 @@ class Products extends BaseController
     }
 
     public function update($id)
-    {   
+    {
         $product = $this->productModel->find($id);
 
         if (!$product) {
@@ -212,15 +212,13 @@ class Products extends BaseController
         }
 
         $params = [
-            'id' => $id,
             'name' => $this->request->getVar('name'),
             'sku' => $this->request->getVar('sku'),
+            'slug' => url_title($this->request->getVar('name'), '-', true),
             'type' => $this->request->getVar('type'),
-            'categories' => $this->request->getVar('categories'),
             'brand_id' => $this->request->getVar('brand_id'),
             'user_id' => $this->currentUser->id,
             'price' => $this->request->getVar('price'),
-            'stock' => $this->request->getVar('stock'),
             'weight' => $this->request->getVar('weight'),
             'length' => $this->request->getVar('length'),
             'width' => $this->request->getVar('width'),
@@ -228,49 +226,47 @@ class Products extends BaseController
             'short_description' => $this->request->getVar('short_description'),
             'description' => $this->request->getVar('description'),
             'status' => $this->request->getVar('status'),
+            'updated_at' => date('Y-m-d H:i:s'),
         ];
 
-        if ($product->type == $this->productModel::CONFIGURABLE) {
-            $params['variants'] = $this->request->getVar('variants');
-        }
-        
+        $categories = $this->request->getVar('categories');
 
         $this->db->transStart();
-        $this->productModel->save($params);
 
-        if ($product && $product->type == $this->productModel::SIMPLE) {
-            $productInventoryTable = $this->db->table('product_inventories');
-            $productInventoryTable->insert([
-                'product_id' => $product->id,
-                'qty' => $params['stock'],
+        // Gunakan update() — bukan save()
+        $this->productModel->update($id, $params);
+
+        // Update inventory & categories
+        if ($product->type === $this->productModel::SIMPLE) {
+            $this->productInventoryModel
+                ->where('product_id', $id)
+                ->delete();
+
+            $this->productInventoryModel->insert([
+                'product_id' => $id,
+                'qty' => $this->request->getVar('stock'),
             ]);
 
-            $productCategoryTable = $this->db->table('product_categories');
-            if (!empty($params['categories'])) {
-                foreach ($params['categories'] as $key => $categoryId) {
-                    $productCategoryTable->insert([
-                        'product_id' => $product->id,
-                        'category_id' => $categoryId,
-                    ]);
-                }
+            $this->db->table('product_categories')->where('product_id', $id)->delete();
+            foreach ($categories as $catId) {
+                $this->db->table('product_categories')->insert([
+                    'product_id' => $id,
+                    'category_id' => $catId,
+                ]);
             }
         }
 
-        if ($product && $product->type == $this->productModel::CONFIGURABLE) {
+        if ($product->type === $this->productModel::CONFIGURABLE) {
+            $params['variants'] = $this->request->getVar('variants');
             $this->updateProductVariants($params);
         }
 
         $this->db->transComplete();
 
-        if ($this->productModel->errors()) {
-            $this->data['categoryIds'] = $params['categories'];
-            $this->data['errors'] = $this->productModel->errors();
-            return view('admin/products/form', $this->data);
-        } else {
-            $this->session->setFlashdata('success', 'Produk berhasil di simpan.');
-            return redirect()->to('/admin/products');
-        }
+        $this->session->setFlashdata('success', 'Produk berhasil diperbarui.');
+        return redirect()->to('/admin/products');
     }
+
 
     public function destroy($id)
     {
