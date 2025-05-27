@@ -63,7 +63,7 @@ class Products extends BaseController
     private function getBrands()
     {
         $brands = [
-            '' => '-- Pilih Brand --',
+            '' => '-- Set Brand --',
         ];
 
         foreach ($this->brandModel->findAll() as $brand) {
@@ -162,10 +162,7 @@ class Products extends BaseController
         $this->productModel->save($params);
         $product = $this->productModel->find($this->db->insertID());
 
-
-        
-
-        if ($product && $product->type == $this->productModel::SIMPLE ) {
+        if ($product && $product->type == $this->productModel::SIMPLE) {
             $productInventoryTable = $this->db->table('product_inventories');
             $productInventoryTable->insert([
                 'product_id' => $product->id,
@@ -193,14 +190,13 @@ class Products extends BaseController
             if ($product->type == $this->productModel::CONFIGURABLE) {
                 return redirect()->to('/admin/products/' . $product->id . '/edit');
             }
-            $this->session->setFlashdata('success', 'Product berhasil di save.');
+            $this->session->setFlashdata('success', 'Product has been saved.');
             return redirect()->to('/admin/products');
         } else {
             $this->data['categoryIds'] = $params['categories'];
             $this->data['errors'] = $this->productModel->errors();
-            return view('admin/products/form', $this->data);
+            return view('admin/products/create', $this->data);
         }
-        
     }
 
     public function update($id)
@@ -212,13 +208,15 @@ class Products extends BaseController
         }
 
         $params = [
+            'id' => $id,
             'name' => $this->request->getVar('name'),
             'sku' => $this->request->getVar('sku'),
-            'slug' => url_title($this->request->getVar('name'), '-', true),
             'type' => $this->request->getVar('type'),
+            'categories' => $this->request->getVar('categories'),
             'brand_id' => $this->request->getVar('brand_id'),
             'user_id' => $this->currentUser->id,
             'price' => $this->request->getVar('price'),
+            'stock' => $this->request->getVar('stock'),
             'weight' => $this->request->getVar('weight'),
             'length' => $this->request->getVar('length'),
             'width' => $this->request->getVar('width'),
@@ -226,47 +224,48 @@ class Products extends BaseController
             'short_description' => $this->request->getVar('short_description'),
             'description' => $this->request->getVar('description'),
             'status' => $this->request->getVar('status'),
-            'updated_at' => date('Y-m-d H:i:s'),
         ];
 
-        $categories = $this->request->getVar('categories');
+        if ($product->type == $this->productModel::CONFIGURABLE) {
+            $params['variants'] = $this->request->getVar('variants');
+        }
 
         $this->db->transStart();
+        $this->productModel->save($params);
 
-        // Gunakan update() — bukan save()
-        $this->productModel->update($id, $params);
-
-        // Update inventory & categories
-        if ($product->type === $this->productModel::SIMPLE) {
-            $this->productInventoryModel
-                ->where('product_id', $id)
-                ->delete();
-
-            $this->productInventoryModel->insert([
-                'product_id' => $id,
-                'qty' => $this->request->getVar('stock'),
+        if ($product && $product->type == $this->productModel::SIMPLE) {
+            $productInventoryTable = $this->db->table('product_inventories');
+            $productInventoryTable->insert([
+                'product_id' => $product->id,
+                'qty' => $params['stock'],
             ]);
 
-            $this->db->table('product_categories')->where('product_id', $id)->delete();
-            foreach ($categories as $catId) {
-                $this->db->table('product_categories')->insert([
-                    'product_id' => $id,
-                    'category_id' => $catId,
-                ]);
+            $productCategoryTable = $this->db->table('product_categories');
+            if (!empty($params['categories'])) {
+                foreach ($params['categories'] as $key => $categoryId) {
+                    $productCategoryTable->insert([
+                        'product_id' => $product->id,
+                        'category_id' => $categoryId,
+                    ]);
+                }
             }
         }
 
-        if ($product->type === $this->productModel::CONFIGURABLE) {
-            $params['variants'] = $this->request->getVar('variants');
+        if ($product && $product->type == $this->productModel::CONFIGURABLE) {
             $this->updateProductVariants($params);
         }
 
         $this->db->transComplete();
 
-        $this->session->setFlashdata('success', 'Produk berhasil diperbarui.');
-        return redirect()->to('/admin/products');
+        if ($this->productModel->errors()) {
+            $this->data['categoryIds'] = $params['categories'];
+            $this->data['errors'] = $this->productModel->errors();
+            return view('admin/products/form', $this->data);
+        } else {
+            $this->session->setFlashdata('success', 'Product has been saved.');
+            return redirect()->to('/admin/products');
+        }
     }
-
 
     public function destroy($id)
     {
@@ -275,12 +274,11 @@ class Products extends BaseController
         if (!$product) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
-        $this->productModel->delete($id);
 
         if (empty($product->deleted_at)) {
             $this->productModel->delete($id);
 
-            $this->session->setFlashdata('success', 'Product berhasil dihapus.');
+            $this->session->setFlashdata('success', 'Product has been deleted.');
             return redirect()->to('/admin/products');
         } else {
             $this->db->table('product_categories')->where('product_id', $id)->delete();
@@ -289,7 +287,7 @@ class Products extends BaseController
 
             $this->productModel->delete($id, true);
 
-            $this->session->setFlashdata('success', 'Produk telah dihapus secara permanen.');
+            $this->session->setFlashdata('success', 'Product has been deleted permanently.');
             return redirect()->to('/admin/products/trashed');
         }
     }
@@ -301,7 +299,7 @@ class Products extends BaseController
         if (!$product) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
-        
+
         if ($product->deleted_at) {
             $params = [
                 'deleted_at' => null,
@@ -309,7 +307,7 @@ class Products extends BaseController
 
             $this->productModel->update($id, $params);
 
-            $this->session->setFlashdata('success', 'Product berhasil dipulihkan.');
+            $this->session->setFlashdata('success', 'Product has been restored.');
             return redirect()->to('/admin/products');
         }
     }
@@ -325,7 +323,7 @@ class Products extends BaseController
         if ($product->parent_id) {
             return redirect()->to('/admin/products/' . $product->parent_id . '/images');
         }
-        
+
         $this->data['product'] = $product;
         $this->data['productImages'] = $this->productImageModel
             ->where('product_id', $product->id)
@@ -364,7 +362,6 @@ class Products extends BaseController
 
         $path = $image->store('products/', $fileName);
 
-
         if ($path) {
             $images = $this->generateImages($path, $fileName);
 
@@ -375,11 +372,11 @@ class Products extends BaseController
 
             $this->productImageModel->save($params);
 
-            $this->session->setFlashdata('success', 'Gambar berhasil disimpan..');
+            $this->session->setFlashdata('success', 'Image has been saved.');
             return redirect()->to('/admin/products/' . $productId . '/images');
         }
 
-        $this->session->setFlashdata('error', 'Gagal upload gambar.');
+        $this->session->setFlashdata('error', 'Image upload failed.');
         return redirect()->to('/admin/products/' . $productId . '/images');
     }
 
@@ -393,7 +390,7 @@ class Products extends BaseController
 
         $this->productImageModel->delete($id);
 
-        $this->session->setFlashdata('success', 'Gambar berhasil dihapus.');
+        $this->session->setFlashdata('success', 'Image has been deleted.');
         return redirect()->to('/admin/products/' . $image->product_id . '/images');
     }
 
@@ -403,10 +400,11 @@ class Products extends BaseController
         $uploadDir = WRITEPATH . 'uploads/';
 
         list($name, $extension) = explode('.', $fileName);
-        
+
         $images = [];
         foreach ($this->productImageModel::IMAGE_SIZES as $size => $sizeDetails) {
             $imagePath = 'products/' . $name . '_' . $size . '.' . $extension;
+
             $imageLib->withFile($uploadDir . $originalPath)
                 ->fit($sizeDetails['width'], $sizeDetails['height'], 'center')
                 ->save($uploadDir . $imagePath);
@@ -448,48 +446,45 @@ class Products extends BaseController
     }
 
     private function generateProductVariants($product, $params)
-        {   
-            
-            $variantAttributes = !(empty($params['configurable'])) ? $params['configurable'] : [];
-            $configurableAttributes = array_column($this->getConfigurableAttributes(), 'code');
+    {
+        $variantAttributes = !(empty($params['configurable'])) ? $params['configurable'] : [];
+        $configurableAttributes = array_column($this->getConfigurableAttributes(), 'code');
 
-            $variantAttributes = array_filter($variantAttributes, function ($value, $key) use ($configurableAttributes) {
-                return in_array($key, $configurableAttributes);
-            }, ARRAY_FILTER_USE_BOTH);
+        $variantAttributes = array_filter($variantAttributes, function ($value, $key) use ($configurableAttributes) {
+            return in_array($key, $configurableAttributes);
+        }, ARRAY_FILTER_USE_BOTH);
 
-            $variants = $this->generateVariantsWithAttributeCombinations($variantAttributes);
-            
-            if ($variants) {
-                foreach ($variants as $variant) {
-                    $variantParams = [
-                        'parent_id' => $product->id,
-                        'user_id' => $product->user_id,
-                        'sku' => $product->sku . '-' . implode('-', array_values($variant)),
-                        'type' => $this->productModel::SIMPLE,
-                        'name' => $product->name . $this->convertVariantAttributesAsName($variant),
-                        'price' => 0,
-                        'status' => $this->productModel::DRAFT,
-                    ];
+        $variants = $this->generateVariantsWithAttributeCombinations($variantAttributes);
 
-                    $this->productModel->save($variantParams);
-                    $newProductVariant = $this->productModel->find($this->db->insertID());
-                    
+        if ($variants) {
+            foreach ($variants as $variant) {
+                $variantParams = [
+                    'parent_id' => $product->id,
+                    'user_id' => $product->user_id,
+                    'sku' => $product->sku . '-' . implode('-', array_values($variant)),
+                    'type' => $this->productModel::SIMPLE,
+                    'name' => $product->name . $this->convertVariantAttributesAsName($variant),
+                    'price' => 0,
+                    'status' => $this->productModel::DRAFT,
+                ];
 
-                    $productCategoryTable = $this->db->table('product_categories');
-                    if (!empty($params['categories'])) {
-                        foreach ($params['categories'] as $key => $categoryId) {
-                            $productCategoryTable->insert([
-                                'product_id' => $newProductVariant->id,
-                                'category_id' => $categoryId,
-                            ]);
-                        }
+                $this->productModel->save($variantParams);
+                $newProductVariant = $this->productModel->find($this->db->insertID());
+
+                $productCategoryTable = $this->db->table('product_categories');
+                if (!empty($params['categories'])) {
+                    foreach ($params['categories'] as $key => $categoryId) {
+                        $productCategoryTable->insert([
+                            'product_id' => $newProductVariant->id,
+                            'category_id' => $categoryId,
+                        ]);
                     }
-
-                    
-                    $this->saveProductAttributeValues($newProductVariant, $variant, $product->id);
                 }
+
+                $this->saveProductAttributeValues($newProductVariant, $variant, $product->id);
             }
         }
+    }
 
     private function saveProductAttributeValues($product, $variant, $parentProductID)
     {
@@ -504,11 +499,10 @@ class Products extends BaseController
                 'text_value' => $attributeOption->name,
             ];
 
-            
             $this->productAttributeValueModel->save($attributeValueParams);
         }
     }
-    
+
     private function convertVariantAttributesAsName($variant)
     {
         $variantName = '';
@@ -524,6 +518,7 @@ class Products extends BaseController
 
         return $variantName;
     }
+
     private function generateVariantsWithAttributeCombinations($arrays)
     {
         $result = [[]];

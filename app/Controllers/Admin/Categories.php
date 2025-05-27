@@ -52,15 +52,6 @@ class Categories extends BaseController
         
         $this->data['selectedParentId'] = $params['parent_id'];
 
-        // // Cek duplikat
-        // if ($this->categoryModel->isDuplicate($params['name'], $params['parent_id'])) {
-        //     $this->session->setFlashdata('errors', 'Kategori dengan nama dan parent ini sudah ada!');
-        //     $this->getCategories();
-        //     $this->getParentOptions();
-        //     return view('admin/categories/index', $this->data);
-        // }
-        // // end cek duplikat
-
         if ($this->categoryModel->save($params)) {
             $this->session->setFlashdata('success', 'Kategori berhasil disimpan.');
             return redirect()->to('/admin/categories');
@@ -80,15 +71,6 @@ class Categories extends BaseController
             'parent_id' => $this->request->getVar('parent_id'),
         ];
         $this->data['selectedParentId'] = $params['parent_id'];
-
-        // // Cek duplikat
-        // if ($this->categoryModel->isDuplicate($params['name'], $params['parent_id'], $id)) {
-        //     $this->session->setFlashdata('errors', 'Kategori dengan nama dan parent ini sudah ada.');
-        //     $this->getCategories();
-        //     $this->getParentOptions();
-        //     return view('admin/categories/index', $this->data);
-        // }
-        // // end cek duplikat
 
         if ($this->categoryModel->save($params)) {
             $this->session->setFlashdata('success', 'Kategori berhasil diperbarui.');
@@ -117,34 +99,6 @@ class Categories extends BaseController
         }
     }
 }
-    // public function index($categoryId = null)
-    // {
-    //     if ($categoryId) {
-    //         $category = $this->categoryModel->find($categoryId);
-    //         if (!$category) {
-    //             $this->session->setFlashdata('errors', 'Invalid category');
-    //             return redirect()->to('/admin/categories');
-    //         }
-
-    //         $this->data['category'] = $category;
-    //     }
-
-    //     $this->getCategories();
-        
-
-    //     return view('admin/categories/index', $this->data);
-    // }
-
-    // private function getCategories()
-    // {
-    //     $this->data['categories'] = $this->categoryModel->paginate($this->perPage, 'bootstrap');
-        
-    // }
-
-    // private function getParentOptions($exceptCategoryId = null)
-    // {
-    //     $this->data['parentOptions'] = $this->categoryModel->getParentOptions($exceptCategoryId);
-    // }
 
     
 
