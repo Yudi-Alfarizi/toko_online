@@ -117,70 +117,50 @@
                 </div>
             </div>
         </div>
-        <div class="row mt-4">
-            <div class="col-xl-3 col-lg-4 col-md-4 col-12">
-                <div class="single-product">
-                    <div class="product-img">
-                        <a href="product-detail.html">
-                            <img src="<?php echo base_url() . '/themes/' . $currentTheme ?>/assets/img/products/p1.jpg" class="img-fluid" />
-                        </a>
-                    </div>
-                    <div class="product-content">
-                        <h3><a href="product-detail.html">Cool &amp; Awesome Item</a></h3>
-                        <div class="product-price">
-                            <span>$57.00</span>
+
+        <?php if (!empty($trendingItems)): ?>
+            <div class="row"> <!-- ✅ Grid wrapper -->
+                <?php foreach ($trendingItems as $item): ?>
+                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-4">
+                        <div class="single-product">
+                            <div class="product-img">
+                                <a href="<?= site_url('products/' . $item->slug) ?>">
+                                    <?php if (!empty($item->image)): ?>
+                                        <img src="<?= base_url('uploads/' . $item->image) ?>"
+                                            class="img-fluid"
+                                            style="width: 100%; height: 300px; object-fit: cover;"
+                                            loading="lazy"
+                                            alt="<?= esc($item->name) ?>" />
+                                    <?php else: ?>
+                                        <img src="<?= base_url('themes/' . $currentTheme . '/assets/img/no-image.png') ?>"
+                                            class="img-fluid"
+                                            style="width: 100%; height: 200px; object-fit: cover;"
+                                            alt="No image available" />
+                                    <?php endif; ?>
+                                </a>
+                            </div>
+                            <div class="product-content">
+                                <h3>
+                                    <a href="<?= site_url('products/' . $item->slug) ?>">
+                                        <?= esc($item->name) ?>
+                                    </a>
+                                </h3>
+                                <div class="product-price">
+                                    <span>Rp <?= number_format($item->real_price ?? $item->price, 0, ',', '.') ?></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                <?php endforeach; ?>
+            </div> <!-- ✅ End Grid -->
+        <?php else: ?>
+            <div class="col-12">
+                <p class="text-muted">Tidak ada produk trending saat ini.</p>
             </div>
-            <div class="col-xl-3 col-lg-4 col-md-4 col-12">
-                <div class="single-product">
-                    <div class="product-img">
-                        <a href="product-detail.html">
-                            <img src="<?php echo base_url() . '/themes/' . $currentTheme ?>/assets/img/products/p2.jpg" class="img-fluid" />
-                        </a>
-                    </div>
-                    <div class="product-content">
-                        <h3><a href="product-detail.html">Cool &amp; Awesome Item</a></h3>
-                        <div class="product-price">
-                            <span>$57.00</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-lg-4 col-md-4 col-12">
-                <div class="single-product">
-                    <div class="product-img">
-                        <a href="product-detail.html">
-                            <img src="<?php echo base_url() . '/themes/' . $currentTheme ?>/assets/img/products/p3.jpg" class="img-fluid" />
-                        </a>
-                    </div>
-                    <div class="product-content">
-                        <h3><a href="product-detail.html">Cool &amp; Awesome Item</a></h3>
-                        <div class="product-price">
-                            <span>$57.00</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-lg-4 col-md-4 col-12">
-                <div class="single-product">
-                    <div class="product-img">
-                        <a href="product-detail.html">
-                            <img src="<?php echo base_url() . '/themes/' . $currentTheme ?>/assets/img/products/p4.jpg" class="img-fluid" />
-                        </a>
-                    </div>
-                    <div class="product-content">
-                        <h3><a href="product-detail.html">Cool &amp; Awesome Item</a></h3>
-                        <div class="product-price">
-                            <span>$57.00</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <?php endif; ?>
     </div>
 </section>
+
 <!-- <section class="mobile-apps pt-5 pb-3 border-top">
     <div class="container">
         <div class="row">

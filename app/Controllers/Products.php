@@ -13,7 +13,7 @@ class Products extends BaseController
     protected $categoryModel;
     protected $brandModel;
     protected $productImageModel;
-    protected $perPage = 3;
+    protected $perPage = 9;
 
     public function __construct()
     {
@@ -27,15 +27,15 @@ class Products extends BaseController
         $this->data['categories'] = $categories;
         $this->data['brands'] = $this->brandModel->findAll();
 
-        // $this->data['ordering'] = [
-        //     site_url('products') => 'Default',
-        //     site_url('products?order=price-asc') => 'Price - Low to High',
-        //     site_url('products?order=price-desc') => 'Price - High to Low',
-        //     site_url('products?order=created_at-desc') => 'Newest to Oldest',
-        //     site_url('products?order=created_at-asc') => 'Oldest to Newest',
-        // ];
+        $this->data['ordering'] = [
+            site_url('products') => 'Default',
+            site_url('products?order=price-asc') => 'Price - Low to High',
+            site_url('products?order=price-desc') => 'Price - High to Low',
+            site_url('products?order=created_at-desc') => 'Newest to Oldest',
+            site_url('products?order=created_at-asc') => 'Oldest to Newest',
+        ];
 
-        // $this->data['selectedOrder'] = site_url('products');
+        $this->data['selectedOrder'] = site_url('products');
     }
 
     public function index()
@@ -82,22 +82,22 @@ class Products extends BaseController
             $products = $products->where('brands.slug', $brandSlug);
         }
 
-        // if ($priceRange = $this->request->getGet('price')) {
-        //     $prices = explode('-', $priceRange);
-        //     $lowPrice = removeAllCharsExceptNumbers($prices[0]);
-        //     $highPrice = removeAllCharsExceptNumbers($prices[1]);
+        if ($priceRange = $this->request->getGet('price')) {
+            $prices = explode('-', $priceRange);
+            $lowPrice = removeAllCharsExceptNumbers($prices[0]);
+            $highPrice = removeAllCharsExceptNumbers($prices[1]);
 
-        //     if ($lowPrice && $highPrice && ($lowPrice < $highPrice)) {
-        //         $products = $products->where("products.price >= $lowPrice AND products.price <= $highPrice OR exists(SELECT * FROM products AS variants WHERE products.id = variants.parent_id AND price >= $lowPrice AND price <= $highPrice)");
-        //     }
-        // }
+            if ($lowPrice && $highPrice && ($lowPrice < $highPrice)) {
+                $products = $products->where("products.price >= $lowPrice AND products.price <= $highPrice OR exists(SELECT * FROM products AS variants WHERE products.id = variants.parent_id AND price >= $lowPrice AND price <= $highPrice)");
+            }
+        }
 
-        // $orderField = 'created_at';
-        // $orderType = 'desc';
-        // if ($order = $this->request->getGet('order')) {
-        //     list($orderField, $orderType) = explode('-', $order);
-        // }
-        // $products = $products->orderBy($orderField, $orderType);
+        $orderField = 'created_at';
+        $orderType = 'desc';
+        if ($order = $this->request->getGet('order')) {
+            list($orderField, $orderType) = explode('-', $order);
+        }
+        $products = $products->orderBy($orderField, $orderType);
 
         $this->data['products'] = $products->paginate($this->perPage, 'bootstrap');
         $this->data['pager'] = $this->productModel->pager;

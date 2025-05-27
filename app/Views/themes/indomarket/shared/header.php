@@ -29,7 +29,7 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-3 col-12 col-sm-6">
-                    <a class="navbar-brand mr-lg-5" href="./index.html">
+                    <a class="navbar-brand mr-lg-5" href="<?= site_url('/') ?>">
                         <i class="fa fa-shopping-bag fa-3x"></i> <span class="logo">UBSI MART</span>
                     </a>
                 </div>
