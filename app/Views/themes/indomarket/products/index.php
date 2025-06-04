@@ -31,16 +31,16 @@
                     <?php if ($products): ?>
                         <?php foreach ($products as $product): ?>
                             <div class="col-lg-4 col-md-6 col-12">
-                                <div class="single-product">
+                                <div class="single-product d-block text-decoration-none text-dark h-100" style="border:1px solid #ddd; border-radius:6px; overflow:hidden; transition: box-shadow 0.3s;">
                                     <?php if (!empty($product->featured_image)): ?>
                                         <div class="product-img">
-                                            <a href="<?= site_url('products/' . $product->sku . '/' . $product->slug) ?>">
-                                                <img src="<?= $product->featured_image->medium ?>" class="img-fluid" />
+                                            <a href="<?= site_url('produk/' . $product->slug) ?>">
+                                                <img src="<?= $product->featured_image->medium ?>" class="img-fluid" style="width: 100%; height: 300px; object-fit: cover; transition: transform 0.3s;" loading="lazy" alt="<?= esc($product->name) ?>" />
                                             </a>
                                         </div>
                                     <?php endif; ?>
                                     <div class="product-content">
-                                        <h3><a href="<?= site_url('products/' . $product->sku . '/' . $product->slug) ?>"><?= $product->name ?></a></h3>
+                                        <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;"><a href="<?= site_url('produk/' . $product->slug) ?>"><?= $product->name ?></a></h3>
                                         <div class="product-price">
                                             <span>IDR <?= number_format($product->lowest_price) ?></span>
                                         </div>

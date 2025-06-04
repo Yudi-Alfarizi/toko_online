@@ -25,6 +25,9 @@
     <!-- Main CSS-->
     <link type="text/css" href="<?php echo base_url() . '/themes/' . $currentTheme ?>/assets/css/style.css" rel="stylesheet">
 
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/Assets/css/custom.css">
+
     <!-- Optional Plugins-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
@@ -34,7 +37,7 @@
     <?php echo $this->include('themes/' . $currentTheme . '/shared/header'); ?>
     <?php echo $this->renderSection('content') ?>
     <?php echo $this->include('themes/' . $currentTheme . '/shared/footer'); ?>
-    
+
     <!-- Core -->
     <script src="<?php echo base_url() . '/themes/' . $currentTheme ?>/assets/js/core/jquery.min.js"></script>
     <script src="<?php echo base_url() . '/themes/' . $currentTheme ?>/assets/js/core/popper.min.js"></script>
@@ -49,6 +52,7 @@
 
     <!-- Main JS-->
     <script src="<?php echo base_url() . '/themes/' . $currentTheme ?>/assets/js/main.js"></script>
+
 </body>
 
 </html>

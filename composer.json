@@ -11,8 +11,9 @@
     },
     "require": {
         "php": "^8.1",
+        "benedmunds/codeigniter-ion-auth": "4.x-dev",
         "codeigniter4/framework": "^4.0",
-        "benedmunds/codeigniter-ion-auth": "4.x-dev"
+        "midtrans/midtrans-php": "dev-master"
     },
     "repositories": [
     {

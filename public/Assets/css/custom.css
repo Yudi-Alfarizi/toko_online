@@ -40,3 +40,49 @@
 .rounded-4 {
     border-radius: 1rem !important;
 }
+
+.thumbnail-img.border-primary {
+    border-width: 2px !important;
+}
+
+.thumbnail-img {
+    cursor: pointer;
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    transition: border-color 0.3s ease;
+}
+
+.thumbnail-img:hover {
+    border-color: #0d6efd !important;
+    /* warna biru bootstrap saat hover */
+}
+
+.carousel-indicators button:hover {
+    border-color: #0d6efd !important;
+    transform: scale(1.05);
+    transition: all 0.2s ease-in-out;
+}
+
+.thumbnail-product.selected {
+    border: 3px solid #0d6efd !important;
+    /* warna biru bootstrap */
+    padding: 1px;
+}
+
+.thumbnail-product {
+    transition: border-color 0.3s ease;
+}
+
+.thumbnail-product:hover {
+    border-color: #0d6efd;
+}
+
+.single-product:hover {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.single-product:hover img {
+    transform: scale(1.05);
+}
+

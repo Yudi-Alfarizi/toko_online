@@ -65,14 +65,23 @@ class Product extends Entity
 
     public function getFeaturedImage()
     {
+        // Coba ambil gambar dari produk ini
         $image = $this->productImageModel
             ->where('product_id', $this->id)
             ->orderBy('created_at', 'desc')
             ->first();
 
+        // Jika tidak ada dan ini adalah varian (anak), ambil dari parent
+        if (!$image && !empty($this->parent_id)) {
+            $image = $this->productImageModel
+                ->where('product_id', $this->parent_id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+        }
+
         return $image;
     }
-    
+
     public function getLowestPrice()
     {
         if ($this->type === $this->productModel::SIMPLE) {
