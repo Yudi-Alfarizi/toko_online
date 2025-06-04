@@ -24,6 +24,15 @@ $routes->get('auth/edit_user/(:num)', 'Auth::edit_user/$1');
 $routes->post('auth/edit_user/(:num)', 'Auth::edit_user/$1');
 $routes->get('auth/forgot_password', 'Auth::forgot_password');
 $routes->post('auth/forgot_password', 'Auth::forgot_password');
+$routes->get('produk/(:segment)', 'ProductController::detail/$1');
+$routes->get('checkout', 'CheckoutController::index');
+$routes->post('checkout', 'CheckoutController::process');
+$routes->get('uploads/products/(:any)', 'ImageController::productImage/$1');
+$routes->get('payment/simulated/(:num)', 'PaymentController::simulated/$1');
+$routes->get('payment/success/(:num)', 'PaymentController::success/$1');
+$routes->get('orders/history', 'OrderController::history');
+$routes->get('orders/(:num)', 'OrderController::show/$1');
+
 
 
 $routes->group('admin', ['filter' => 'admin-auth:admin,operator'],function ($routes) {

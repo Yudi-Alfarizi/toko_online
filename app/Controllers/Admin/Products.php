@@ -234,15 +234,28 @@ class Products extends BaseController
         $this->productModel->save($params);
 
         if ($product && $product->type == $this->productModel::SIMPLE) {
-            $productInventoryTable = $this->db->table('product_inventories');
-            $productInventoryTable->insert([
-                'product_id' => $product->id,
-                'qty' => $params['stock'],
-            ]);
+            // ✅ PERBAIKAN: Update atau Insert inventory
+            $existingInventory = $this->productInventoryModel
+                ->where('product_id', $product->id)
+                ->first();
 
+            if ($existingInventory) {
+                $this->productInventoryModel->update($existingInventory->id, [
+                    'qty' => $params['stock'],
+                ]);
+            } else {
+                $this->productInventoryModel->insert([
+                    'product_id' => $product->id,
+                    'qty' => $params['stock'],
+                ]);
+            }
+
+            // ✅ PERBAIKAN: Hapus dulu kategori lama, lalu insert ulang
             $productCategoryTable = $this->db->table('product_categories');
+            $productCategoryTable->where('product_id', $product->id)->delete();
+
             if (!empty($params['categories'])) {
-                foreach ($params['categories'] as $key => $categoryId) {
+                foreach ($params['categories'] as $categoryId) {
                     $productCategoryTable->insert([
                         'product_id' => $product->id,
                         'category_id' => $categoryId,

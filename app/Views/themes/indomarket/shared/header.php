@@ -2,19 +2,20 @@
     <div class="top-bar d-none d-sm-block">
         <div class="container">
             <div class="row">
-                <div class="col-6 text-left">
+                <div class="col-4 text-left">
                     <ul class="top-links contact-info">
                         <li><i class="fa fa-envelope-o"></i> <a href="#">ubsi@bsi.ac.id</a></li>
                         <li><i class="fa fa-whatsapp"></i> 08123456789</li>
                     </ul>
                 </div>
-                <div class="col-6 text-right">
+                <div class="col-8 text-right">
                     <ul class="top-links account-links">
                         <?php if ($auth->loggedIn()): ?>
                             <?php if ($auth->inGroup(['admin', 'operator'], $currentUser->id)): ?>
                                 <li><i class="fa fa-tachometer"></i> <a href="<?php echo site_url('admin/dashboard') ?>">Dashboard</a></li>
                             <?php endif; ?>
                             <li><i class="fa fa-user-circle-o"></i> <a href="<?= site_url('auth/edit_user/' . ($currentUser ? $currentUser->id : '')) ?>">My Account</a></li>
+                            <li><i class="fa fa-list-alt"></i> <a href="<?= site_url('orders/history') ?>">Riwayat Pesanan</a></li>
                             <li><i class="fa fa-power-off"></i> <a href="<?php echo site_url('auth/logout') ?>">Logout ( <?php echo $currentUser->first_name ?> )</a></li>
                         <?php else:  ?>
                             <li><i class="fa fa-user-circle-o"></i> <a href="<?php echo site_url('auth/create_user') ?>">Register</a></li>
@@ -70,20 +71,14 @@
 
             <div class="collapse navbar-collapse" id="main_nav">
                 <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
+                    <li class="nav-item">
                         <a class="nav-link" href="<?= site_url('/') ?>">Home</a>
                     </li>
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link" href="#">About</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="true">Pages</a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="<?= site_url('/products') ?>">Products</a>
-                            <a class="dropdown-item" href="product-detail.html">Product Detail</a>
-                            <a class="dropdown-item" href="cart.html">Cart</a>
-                            <a class="dropdown-item" href="checkout.html">Checkout</a>
-                        </div>
+                    </li> -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= site_url('/products') ?>">Products</a>
                     </li>
                 </ul>
             </div> <!-- collapse .// -->

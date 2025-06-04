@@ -51,10 +51,10 @@
                         <!-- Single Widget -->
                         <div class="contact">
                             <ul>
-                                <li>NO. 342 - London Oxford Street.</li>
-                                <li>012 United Kingdom.</li>
-                                <li>info@indomarket.com</li>
-                                <li>+032 3456 7890</li>
+                                <li>Slipi - Jakarta Barat</li>
+                                <li>Indonesia</li>
+                                <li>ubsi@bsi.ac.id</li>
+                                <li>081 2345 6789</li>
                             </ul>
                         </div>
                         <!-- End Single Widget -->
@@ -74,16 +74,15 @@
         <div class="container">
             <div class="copyright-inner border-top">
                 <div class="row">
-                    <div class="col-lg-6 col-12">
+                    <div class="col-lg-7 col-12">
                         <div class="left">
-                            <p>Copyright © 2025 UBSI - Teknik Informatika - 15.4A.26. All rights reserved.</p>
+                            <p>Copyright © 2025 UBSI - Teknik Informatika - 15.4A.26 - Kelompok 3. All rights reserved.</p>
                         </div>
                     </div>
-                    <div class="col-lg-6 col-12">
+                    <div class="col-lg-5 col-12">
                         <div class="right pull-right">
                             <ul class="payment-cards">
                                 <li><i class="fa fa-cc-paypal"></i></li>
-                                <li><i class="fa fa-cc-amex"></i></li>
                                 <li><i class="fa fa-cc-mastercard"></i></li>
                                 <li><i class="fa fa-cc-stripe"></i></li>
                                 <li><i class="fa fa-cc-visa"></i></li>
