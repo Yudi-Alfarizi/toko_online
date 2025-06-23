@@ -34,21 +34,21 @@
                         </ol>
                         <div class="carousel-inner shadow-sm rounded">
                             <div class="carousel-item active">
-                                <img class="d-block w-100" src="<?= base_url('themes/' . $currentTheme . '/assets/img/slides/slide1.jpg') ?>" alt="First slide">
+                                <img class="d-block w-100 carousel-img" src="<?= base_url('themes/' . $currentTheme . '/assets/img/slides/audio.webp') ?>" alt="First slide">
                                 <div class="carousel-caption d-none d-md-block">
-                                    <h5>Mountains, Nature Collection</h5>
+                                    <!-- Optional Caption -->
                                 </div>
                             </div>
                             <div class="carousel-item">
-                                <img class="d-block w-100" src="<?= base_url('themes/' . $currentTheme . '/assets/img/slides/slide2.jpg') ?>" alt="Second slide">
+                                <img class="d-block w-100 carousel-img" src="<?= base_url('themes/' . $currentTheme . '/assets/img/slides/hp.jpg') ?>" alt="Second slide">
                                 <div class="carousel-caption d-none d-md-block">
-                                    <h5>Freedom, Sea Collection</h5>
+                                    <!-- Optional Caption -->
                                 </div>
                             </div>
                             <div class="carousel-item">
-                                <img class="d-block w-100" src="<?= base_url('themes/' . $currentTheme . '/assets/img/slides/slide3.jpg') ?>" alt="Third slide">
+                                <img class="d-block w-100 carousel-img" src="<?= base_url('themes/' . $currentTheme . '/assets/img/slides/laptop.webp') ?>" alt="Third slide">
                                 <div class="carousel-caption d-none d-md-block">
-                                    <h5>Living the Dream, Lost Island</h5>
+                                    <!-- Optional Caption -->
                                 </div>
                             </div>
                         </div>

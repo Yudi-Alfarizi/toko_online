@@ -52,6 +52,7 @@
                 </div>
                 <div class="row">
                     <div class="col-12">
+                        <br>
                         <?php echo $pager->links('bootstrap', 'bootstrap_pagination') ?>
                     </div>
                 </div>
