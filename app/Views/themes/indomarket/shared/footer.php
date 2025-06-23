@@ -8,11 +8,8 @@
                         <div class="logo-footer">
                             <i class="fa fa-shopping-bag fa-3x"></i> <span class="logo">UBSI Mart</span>
                         </div>
-                        <p class="text">Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, magna
-                            eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor,
-                            facilisis luctus, metus.</p>
-                        <p class="call">Got Question? Call us 24/7<span><a href="tel:123456789">+0123 456
-                                    789</a></span></p>
+                        <p class="text">Toko online sederhana berbasis CodeIgniter 4 yang dilengkapi dengan sistem checkout, integrasi pembayaran menggunakan Midtrans, serta fitur riwayat dan status pesanan. Dikembangkan sebagai bagian dari proyek akhir untuk penerapan teknologi web modern.</p>
+                        <p class="call">Ada Pertanyaan? Hubungi 24/7<span><a href="tel:123456789">08123456789</a></span></p>
                     </div>
                     <!-- End Single Widget -->
                 </div>
